@@ -1,0 +1,10 @@
+{
+    "if_change":0,
+    "set":{
+    "switch":1,
+    "personalMode":3,
+    "windSpeed":1,
+    "needTemperature":26,
+    "mode":0
+    }
+}
