@@ -11,7 +11,8 @@
 #include "../test/keep.h"
 #include <IRremoteESP8266.h> //红外
 #include <IRsend.h>
-#include <ir_Gree.h>
+// #include <ir_Gree.h>
+#include <ir_Kelvinator.h>//真他妈离谱
 void lcd_update_outRoom_temperature(){};
 void lcd_update_conditioner_setting(){};
 void lcd_update_inRoom_temperature(){};
@@ -19,11 +20,11 @@ void lcd_update_time(){};
 void lcd_setup(){};
 void connect_WIFI();
 void humid_condition(uint8_t mode);
-void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set = 1, uint8_t light = 1, uint8_t sleep = 1);
+void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set = 1, uint8_t light = 1);
 void correct_time();
 void set_air_conditioner(/*bool man_open*/);
-const char *sid = "gongdao";            // wifi name
-const char *password = "12345678";      // wifi password
+const char *sid = "HUAWEI";             // wifi name
+const char *password = "qwertyuiop";    // wifi password
 const char *ntpServer = "pool.ntp.org"; // 网络时间服务器
 const long gmtOffset_sec = 8 * 3600;    // 时区设置函数，东八区（UTC/GMT+8:00）写成8*3600
 const int daylightOffset_sec = 0;       // 夏令时填写3600，否则填0
@@ -36,7 +37,7 @@ int wind_speed;
 int conditionMode;
 struct tm time_info;
 const uint16_t kIrLed = 15; // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRGreeAC ac(kIrLed);        // Set the GPIO to be used for sending messages.
+IRKelvinatorAC ac(kIrLed);  // Set the GPIO to be used for sending messages.
 uint8_t temp, begin;
 bool flag_tm_min10 = true;
 bool flag_tm_min2 = true;
@@ -52,6 +53,7 @@ void setup()
 
 void loop()
 {
+  hong_wai(26, Setmode, SetWindSpeed);
   correct_time();
   Serial.print("min:");
   Serial.println(time_info.tm_min);
@@ -122,8 +124,9 @@ void closeAirCondition()
   // Serial.println("not running");
 }
 // 红外模块
-void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t light, uint8_t sleep) // 请输入 是否打开(1打开0关闭) 温度 模式(0自动1除湿2制冷3通风4制热) 风速(123)  扫风 灯光 睡眠;
+void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t light) // 请输入 是否打开(1打开0关闭) 温度 模式(0自动1除湿2制冷3通风4制热) 风速(123)  扫风 灯光 睡眠;
 {
+  Serial.println("hello");
   if (begin_set)
   {
     delay(200);
@@ -134,10 +137,8 @@ void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t 
     ac.setTemp(temp); // 16
     ac.setXFan(false);
     ac.setLight(light);
-    ac.setSleep(sleep);
-    ac.setTurbo(false);
 
-#if SEND_GREE
+#if SEND_KELVINATOR
     ac.send();
 #endif
     delay(1000);
@@ -236,7 +237,7 @@ void set_air_conditioner(/*bool man_open*/)
   // Serial.println(on_off);
   // 解析当前空调应该处于的状态（开或关）
   String r = if_auto_open();
- 	int switches = (r =="0") ? 0 : 1;
+  int switches = (r == "0") ? 0 : 1;
   // StaticJsonDocument<1024> doc3;
   // deserializeJson(doc3, r);
   // DeserializationError err3 = deserializeJson(doc3, r);
@@ -245,6 +246,7 @@ void set_air_conditioner(/*bool man_open*/)
 
   if (if_change) // 如果用户通过网页进行输入且修改设置了
   {              // 更新空调状态
+    Serial.println("用户更改设置！");
     switches = on_off;
     personal_mode = personalMode;
     wind_speed = windSpeed;
@@ -257,25 +259,25 @@ void set_air_conditioner(/*bool man_open*/)
     return;
   }
   int TiGan = personalMode - 3; // 根据用户喜好进行修改温度用到的参数
-int open_flag;
-  //根据外界温度高低分类给出不同设置
-  //  if (out_real_feel0 >= 35)
-   {//根据当前的时间不同给出不同的设置
-    //  if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
-    //  {
-       static int setTemp;
-       if (!open_flag)//是循环的第一次时
-       {
-         setTemp = 25;
-         SetWindSpeed = 2;
-         Setmode = 2;
-       }
-       else if (if_change)
-         keepInRealFeel(needTemperature, setTemp);
-       else
-         keepInRealFeel(27 + TiGan, setTemp);
-       hong_wai(setTemp, Setmode, SetWindSpeed);
-    //  }
+  int open_flag;
+  // 根据外界温度高低分类给出不同设置
+  //   if (out_real_feel0 >= 35)
+  // 根据当前的时间不同给出不同的设置
+  //   if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
+  //   {
+  static int setTemp;
+  if (!open_flag) // 是循环的第一次时
+  {
+    setTemp = 25;
+    SetWindSpeed = 2;
+    Setmode = 2;
+  }
+  else if (if_change)
+    keepInRealFeel(needTemperature, setTemp);
+  else
+    keepInRealFeel(27 + TiGan, setTemp);
+  hong_wai(setTemp, Setmode, SetWindSpeed);
+  //  }
   //    if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
   //    {
   //      static int setTemp;
