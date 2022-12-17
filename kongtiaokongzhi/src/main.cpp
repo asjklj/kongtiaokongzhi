@@ -22,6 +22,7 @@ void connect_WIFI();
 void humid_condition(uint8_t mode);
 void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set = 1, uint8_t light = 1);
 void correct_time();
+void closeAirCondition();
 void set_air_conditioner(/*bool man_open*/);
 const char *sid = "HUAWEI";             // wifi name
 const char *password = "qwertyuiop";    // wifi password
@@ -41,6 +42,16 @@ IRKelvinatorAC ac(kIrLed);  // Set the GPIO to be used for sending messages.
 uint8_t temp, begin;
 bool flag_tm_min10 = true;
 bool flag_tm_min2 = true;
+int if_change, windSpeed,  needTemperature, modeChange, personalMode ,on_off;
+char condition0[20];
+char conditionId0[20];
+char out_real_feel[20];
+int out_real_feel0;
+char iconDay0[20];
+char iconNight0[20];
+String r;
+String s;
+String t ;
 
 void setup()
 {
@@ -53,15 +64,95 @@ void setup()
 
 void loop()
 {
+<<<<<<< HEAD
   hong_wai(26, Setmode, SetWindSpeed);
+=======
+
+>>>>>>> 4cdf6a084d94012d49293a576bfc32804fe31e41
   correct_time();
   Serial.print("min:");
   Serial.println(time_info.tm_min);
   Serial.print("sec:");
   Serial.println(time_info.tm_sec);
-  // http
+   // 解析室外气象数据
+  s = getWeather(1);
+  StaticJsonDocument<1024> doc1;
+  deserializeJson(doc1, s);
+  DeserializationError err1 = deserializeJson(doc1, s);
+  Serial.println(s);
+  delay(1000);
+  // 读取室外气象数据
+  strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
+  strcpy(conditionId0 , doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
+  // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
+  // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
+  // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
+  strcpy(out_real_feel , doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
+  out_real_feel0 = std::stoi(out_real_feel);
+  // const char* date0=doc["data"]["hourly"][0]["date"];//日期
+  strcpy(iconDay0 ,doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
+  strcpy(iconNight0 ,doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
+  // const char* qpf0=doc["data"]["hourly"][0]["qpf"];//定量降水预报
+  // Serial.println(if_change);
+  // Serial.println(windSpeed);
+  // Serial.println(needTemperature);
+  // Serial.println(mode_change);
+  // 室内传感器获取数据：1.体感温度inrealfeel 2.湿度inhumidity
+  // Serial.print("condition0:");
+  // Serial.println(condition0);
+  // Serial.print("conditionId0:");
+  // Serial.println(conditionId0);
+  // Serial.print("out_real_feel:");
+  // Serial.println(out_real_feel);
+  // 解析用户输入修改
+  t = getChange();
+  StaticJsonDocument<1024> doc2;
+  deserializeJson(doc2, t);
+  DeserializationError err2 = deserializeJson(doc2, t);
+  Serial.println(t);
+  // 读取用户输入修改的参数
+  if_change = doc2["if_change"];
+  windSpeed = doc2["set"]["windSpeed"];
+  needTemperature = doc2["set"]["needTemperature"];
+  modeChange = doc2["set"]["Mode"];
+  personalMode = doc2["set"]["personalMode"];
+  on_off = doc2["set"]["on_off"];
+  // Serial.print("if_change:");
+  // Serial.println(if_change);
+  // Serial.print("windSpeed:");
+  // Serial.println(windSpeed);
+  // Serial.print("needTemperature:");
+  // Serial.println(needTemperature);
+  // Serial.print("modeChange:");
+  // Serial.println(modeChange);
+  // Serial.print("personalMode:");
+  // Serial.println(personalMode);
+  // Serial.print("on_off:");
+  // Serial.println(on_off);
+  // 解析当前空调应该处于的状态（开或关）
+  r = if_auto_open();
+  switches = (r =="0") ? 0 : 1;
+  // StaticJsonDocument<1024> doc3;
+  // deserializeJson(doc3, r);
+  // DeserializationError err3 = deserializeJson(doc3, r);
+  // int switches = doc3["if_auto_open"];
+  Serial.println(r);
+
+  if (if_change) // 如果用户通过网页进行输入且修改设置了
+  {              // 更新空调状态
+    switches = on_off;
+    personal_mode = personalMode;
+    wind_speed = windSpeed;
+    conditionMode = modeChange;
+  }
+  if (!switches) // 判断当前空调是否应当开启
+  {
+    open_flag = false;
+    closeAirCondition();
+    return;
+  }
   int if_on = true; // json
-  if (if_on && open_flag == 0)
+  if (open_flag == 0)//第一次
   {
     set_air_conditioner();
     lcd_update_outRoom_temperature();
@@ -92,7 +183,6 @@ void loop()
     flag_tm_min2 = true;
 
   lcd_update_time();
-  // delay(60000);
   delay(5000);
   open_flag = true;
 }
@@ -180,6 +270,7 @@ void correct_time()
 // 设置空调状态
 void set_air_conditioner(/*bool man_open*/)
 {
+<<<<<<< HEAD
   // 解析室外气象数据
   String s = getWeather(1);
   StaticJsonDocument<1024> doc1;
@@ -278,6 +369,29 @@ void set_air_conditioner(/*bool man_open*/)
     keepInRealFeel(27 + TiGan, setTemp);
   hong_wai(setTemp, Setmode, SetWindSpeed);
   //  }
+=======
+ 
+  int TiGan = personalMode - 3; // 根据用户喜好进行修改温度用到的参数
+int open_flag;
+  //根据外界温度高低分类给出不同设置
+  //  if (out_real_feel0 >= 35){
+   //根据当前的时间不同给出不同的设置
+    //  if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
+    //  {
+       static int setTemp;
+       if (!open_flag)//是循环的第一次时
+       {
+         setTemp = 25;
+         SetWindSpeed = 2;
+         Setmode = 2;
+       }
+       else if (if_change)
+         keepInRealFeel(needTemperature, setTemp);
+       else
+         keepInRealFeel(27 + TiGan, setTemp);
+       hong_wai(setTemp, Setmode, SetWindSpeed);
+    //  }
+>>>>>>> 4cdf6a084d94012d49293a576bfc32804fe31e41
   //    if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
   //    {
   //      static int setTemp;
