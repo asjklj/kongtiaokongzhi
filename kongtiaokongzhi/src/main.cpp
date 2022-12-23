@@ -53,7 +53,7 @@ const int daylightOffset_sec = 0;       // 夏令时填写3600，否则填0
 bool open_flag = false;                 // 判断空调循环是否为第一次
 int SetWindSpeed;
 int Setmode;
-int switches;
+int switches=0;
 int personal_mode = 3;
 int wind_speed;
 int conditionMode;
@@ -106,7 +106,7 @@ void setup()
 }
 
 void loop()
-{
+{    delay(2000);
   update_today_temp(-2,7);
   update_weather(2);
   correct_time();
@@ -162,7 +162,6 @@ void loop()
   {
     open_flag = false;
     closeAirCondition();
-    return;
   }
   int if_on = true;   // json
   if (open_flag == 0) // 第一次
@@ -198,7 +197,6 @@ void loop()
   // Serial.println(out_real_feel);
     set_air_conditioner();
   }
-
   if (time_info.tm_min % 10 == 0) // per 10 mins
   {
     if (flag_tm_min10)
@@ -237,8 +235,7 @@ void loop()
       set_air_conditioner();
     }
   }
-  else
-    flag_tm_min10 = true;
+  else{ flag_tm_min10 = true;}
   if (time_info.tm_min % 2 == 0) // per 2 mins
   {
     if (flag_tm_min2)
@@ -248,9 +245,8 @@ void loop()
       update_date(tempNow);
     }
   }
-  else
-    flag_tm_min2 = true;
-  delay(5000);
+  else{flag_tm_min2 = true;}
+
   open_flag = true;
 }
 // 打开除湿模式
@@ -574,7 +570,6 @@ void humid_condition(uint8_t mode)
 {
   if (1)
   {
-    delay(200);
     ac.on();
     ac.setMode(mode);
     ac.setTurbo(false);
@@ -601,7 +596,6 @@ void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t 
 {
   if (begin_set)
   {
-    delay(200);
     ac.on();
     ac.setFan(speed); //(123)
                       // kGreeAuto 0, kGreeDry 1, kGreeCool 2, kGreeFan 3, kGreeHeat 4
