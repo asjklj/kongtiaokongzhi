@@ -114,36 +114,7 @@ void loop()
   Serial.println(time_info.tm_min);
   Serial.print("sec:");
   Serial.println(time_info.tm_sec);
-  // 解析室外气象数据
-  s = getWeather(1);
-  StaticJsonDocument<1024> doc1;
-  deserializeJson(doc1, s);
-  DeserializationError err1 = deserializeJson(doc1, s);
-  Serial.println(s);
-  delay(1000);
-  // 读取室外气象数据
-  strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
-  strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
-  // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
-  // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
-  // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
-  strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
-  out_real_feel0 = std::stoi(out_real_feel);
-  // const char* date0=doc["data"]["hourly"][0]["date"];//日期
-  strcpy(iconDay0, doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
-  strcpy(iconNight0, doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
-  // const char* qpf0=doc["data"]["hourly"][0]["qpf"];//定量降水预报
-  // Serial.println(if_change);
-  // Serial.println(windSpeed);
-  // Serial.println(needTemperature);
-  // Serial.println(mode_change);
-  // 室内传感器获取数据：1.体感温度inrealfeel 2.湿度inhumidity
-  // Serial.print("condition0:");
-  // Serial.println(condition0);
-  // Serial.print("conditionId0:");
-  // Serial.println(conditionId0);
-  // Serial.print("out_real_feel:");
-  // Serial.println(out_real_feel);
+
   // 解析用户输入修改
   t = getChange();
   StaticJsonDocument<1024> doc2;
@@ -205,6 +176,36 @@ void loop()
     if (flag_tm_min10)
     {
       flag_tm_min10 = false;
+        // 解析室外气象数据
+  s = getWeather(1);
+  StaticJsonDocument<1024> doc1;
+  deserializeJson(doc1, s);
+  DeserializationError err1 = deserializeJson(doc1, s);
+  Serial.println(s);
+  delay(1000);
+  // 读取室外气象数据
+  strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
+  strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
+  // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
+  // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
+  // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
+  strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
+  out_real_feel0 = std::stoi(out_real_feel);
+  // const char* date0=doc["data"]["hourly"][0]["date"];//日期
+  strcpy(iconDay0, doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
+  strcpy(iconNight0, doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
+  // const char* qpf0=doc["data"]["hourly"][0]["qpf"];//定量降水预报
+  // Serial.println(if_change);
+  // Serial.println(windSpeed);
+  // Serial.println(needTemperature);
+  // Serial.println(mode_change);
+  // 室内传感器获取数据：1.体感温度inrealfeel 2.湿度inhumidity
+  // Serial.print("condition0:");
+  // Serial.println(condition0);
+  // Serial.print("conditionId0:");
+  // Serial.println(conditionId0);
+  // Serial.print("out_real_feel:");
+  // Serial.println(out_real_feel);
       set_air_conditioner();
     }
   }
