@@ -24,21 +24,16 @@
 #define SD_CS 18
 void drawSdJpeg(const char *filename, int xpos, int ypos);
 void jpegRender(int xpos, int ypos);
-void update_wind(int speed);                   // 显示风速
-void update_mode(int work);                    // 工作模式
-void update_user(int usermode);                // 用户偏好
-void update_tempset(int set);                  // 显示设置温度
-void update_tempnow(int tempnow);              // 当前温度
-void update_date(int date);                    // 显示日期
-void update_day(int day);                      // 显示星期几
-void update_weather(int weather);              // 显示天气
+void update_wind(int speed);                      // 显示风速
+void update_mode(int work);                       // 工作模式
+void update_user(int usermode);                   // 用户偏好
+void update_tempset(int set);                     // 显示设置温度
+void update_tempnow(int tempnow);                 // 当前温度
+void update_date(int date);                       // 显示日期
+void update_day(int day);                         // 显示星期几
+void update_weather(int weather);                 // 显示天气
 void update_today_temp(int tempmin, int tempmax); // 显示当日气温
-void update_time(int hour, int min);           // 显示时间
-void lcd_update_outRoom_temperature(){};
-void lcd_update_conditioner_setting(){};
-void lcd_update_inRoom_temperature(){};
-void lcd_update_time(){};
-void lcd_setup(){};
+void update_time(int hour, int min);              // 显示时间
 void connect_WIFI();
 void humid_condition(uint8_t mode);
 void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set = 1, uint8_t light = 1, uint8_t sleep = 1);
@@ -53,13 +48,13 @@ const int daylightOffset_sec = 0;       // 夏令时填写3600，否则填0
 bool open_flag = false;                 // 判断空调循环是否为第一次
 int SetWindSpeed;
 int Setmode;
-int switches=0;
+int switches = 0;
 int personal_mode = 3;
 int wind_speed;
 int conditionMode;
 struct tm time_info;
 const uint16_t kIrLed = 15; // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRKelvinatorAC ac(kIrLed);    // Set the GPIO to be used for sending messages.
+IRKelvinatorAC ac(kIrLed);  // Set the GPIO to be used for sending messages.
 uint8_t temp, begin;
 bool flag_tm_min10 = true;
 bool flag_tm_min2 = true;
@@ -80,7 +75,13 @@ char BL_L[20][20] = {"/BLL/BL_L0.jpg", "/BLL/BL_L1.jpg", "/BLL/BL_L2.jpg", "/BLL
 char day[10][20] = {"/DAY/WH_d1.jpg", "/DAY/WH_d2.jpg", "/DAY/WH_d3.jpg", "/DAY/WH_d4.jpg", "/DAY/WH_d5.jpg", "/DAY/WH_d6.jpg", "/DAY/WH_d7.jpg"};
 char speed[5][20] = {"/WIND/speed1.jpg", "/WIND/speed2.jpg", "/WIND/speed3.jpg", "/WIND/speed4.jpg"};
 char mode[5][20] = {"/MODE/0AU.jpg", "/MODE/1DR.jpg", "/MODE/2CO.jpg", "/MODE/3FA.jpg", "/MODE/4HE.jpg"};
-char user[5][20] = {    "/USER/user0.jpg",    "/USER/user1.jpg",    "/USER/user2.jpg",    "/USER/user3.jpg",    "/USER/user4.jpg",};
+char user[5][20] = {
+    "/USER/user0.jpg",
+    "/USER/user1.jpg",
+    "/USER/user2.jpg",
+    "/USER/user3.jpg",
+    "/USER/user4.jpg",
+};
 char weather[20][30] = {"/WEATHER/sunny.jpg", "/WEATHER/duoyun.jpg", "/WEATHER/yin.jpg", "/WEATHER/xiaoyu.jpg", "/WEATHER/zhongyu.jpg", "/WEATHER/dayu.jpg", "/WEATHER/zhenyu.jpg", "/WEATHER/leizhenyu.jpg", "/WEATHER/yujiaxue.jpg", "/WEATHER/xiaoxue.jpg", "/WEATHER/zhongxue.jpg", "/WEATHER/daxue.jpg"};
 TFT_eSPI tft = TFT_eSPI(320, 240);
 SPIClass sdSPI(VSPI);
@@ -106,8 +107,9 @@ void setup()
 }
 
 void loop()
-{    delay(2000);
-  update_today_temp(-2,7);
+{
+  delay(2000);
+  update_today_temp(-2, 7);
   update_weather(2);
   correct_time();
   Serial.print("min:");
@@ -166,35 +168,35 @@ void loop()
   int if_on = true;   // json
   if (open_flag == 0) // 第一次
   {
-   s = getWeather(1);
-  StaticJsonDocument<1024> doc1;
-  deserializeJson(doc1, s);
-  DeserializationError err1 = deserializeJson(doc1, s);
-  Serial.println(s);
-  delay(1000);
-  // 读取室外气象数据
-  strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
-  strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
-  // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
-  // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
-  // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
-  strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
-  out_real_feel0 = std::stoi(out_real_feel);
-  // const char* date0=doc["data"]["hourly"][0]["date"];//日期
-  strcpy(iconDay0, doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
-  strcpy(iconNight0, doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
-  // const char* qpf0=doc["data"]["hourly"][0]["qpf"];//定量降水预报
-  // Serial.println(if_change);
-  // Serial.println(windSpeed);
-  // Serial.println(needTemperature);
-  // Serial.println(mode_change);
-  // 室内传感器获取数据：1.体感温度inrealfeel 2.湿度inhumidity
-  // Serial.print("condition0:");
-  // Serial.println(condition0);
-  // Serial.print("conditionId0:");
-  // Serial.println(conditionId0);
-  // Serial.print("out_real_feel:");
-  // Serial.println(out_real_feel);
+    s = getWeather(1);
+    StaticJsonDocument<1024> doc1;
+    deserializeJson(doc1, s);
+    DeserializationError err1 = deserializeJson(doc1, s);
+    Serial.println(s);
+    delay(1000);
+    // 读取室外气象数据
+    strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
+    strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
+    // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
+    // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
+    // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
+    strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
+    out_real_feel0 = std::stoi(out_real_feel);
+    // const char* date0=doc["data"]["hourly"][0]["date"];//日期
+    strcpy(iconDay0, doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
+    strcpy(iconNight0, doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
+                                                                // const char* qpf0=doc["data"]["hourly"][0]["qpf"];//定量降水预报
+                                                                // Serial.println(if_change);
+                                                                // Serial.println(windSpeed);
+                                                                // Serial.println(needTemperature);
+                                                                // Serial.println(mode_change);
+                                                                // 室内传感器获取数据：1.体感温度inrealfeel 2.湿度inhumidity
+                                                                // Serial.print("condition0:");
+                                                                // Serial.println(condition0);
+                                                                // Serial.print("conditionId0:");
+                                                                // Serial.println(conditionId0);
+                                                                // Serial.print("out_real_feel:");
+                                                                // Serial.println(out_real_feel);
     set_air_conditioner();
   }
   if (time_info.tm_min % 10 == 0) // per 10 mins
@@ -202,370 +204,387 @@ void loop()
     if (flag_tm_min10)
     {
       flag_tm_min10 = false;
-        // 解析室外气象数据
-  s = getWeather(1);
-  StaticJsonDocument<1024> doc1;
-  deserializeJson(doc1, s);
-  DeserializationError err1 = deserializeJson(doc1, s);
-  Serial.println(s);
-  delay(1000);
-  // 读取室外气象数据
-  strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
-  strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
-  // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
-  // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
-  // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
-  strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
-  out_real_feel0 = std::stoi(out_real_feel);
-  // const char* date0=doc["data"]["hourly"][0]["date"];//日期
-  strcpy(iconDay0, doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
-  strcpy(iconNight0, doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
-  // const char* qpf0=doc["data"]["hourly"][0]["qpf"];//定量降水预报
-  // Serial.println(if_change);
-  // Serial.println(windSpeed);
-  // Serial.println(needTemperature);
-  // Serial.println(mode_change);
-  // 室内传感器获取数据：1.体感温度inrealfeel 2.湿度inhumidity
-  // Serial.print("condition0:");
-  // Serial.println(condition0);
-  // Serial.print("conditionId0:");
-  // Serial.println(conditionId0);
-  // Serial.print("out_real_feel:");
-  // Serial.println(out_real_feel);
+      // 解析室外气象数据
+      s = getWeather(1);
+      StaticJsonDocument<1024> doc1;
+      deserializeJson(doc1, s);
+      DeserializationError err1 = deserializeJson(doc1, s);
+      Serial.println(s);
+      delay(1000);
+      // 读取室外气象数据
+      strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
+      strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
+      // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
+      // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
+      // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
+      strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
+      out_real_feel0 = std::stoi(out_real_feel);
+      // const char* date0=doc["data"]["hourly"][0]["date"];//日期
+      strcpy(iconDay0, doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
+      strcpy(iconNight0, doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
+                                                                  // const char* qpf0=doc["data"]["hourly"][0]["qpf"];//定量降水预报
+                                                                  // Serial.println(if_change);
+                                                                  // Serial.println(windSpeed);
+                                                                  // Serial.println(needTemperature);
+                                                                  // Serial.println(mode_change);
+                                                                  // 室内传感器获取数据：1.体感温度inrealfeel 2.湿度inhumidity
+                                                                  // Serial.print("condition0:");
+                                                                  // Serial.println(condition0);
+                                                                  // Serial.print("conditionId0:");
+                                                                  // Serial.println(conditionId0);
+                                                                  // Serial.print("out_real_feel:");
+                                                                  // Serial.println(out_real_feel);
       set_air_conditioner();
     }
   }
-  else{ flag_tm_min10 = true;}
+  else
+  {
+    flag_tm_min10 = true;
+  }
   if (time_info.tm_min % 2 == 0) // per 2 mins
   {
     if (flag_tm_min2)
     {
       flag_tm_min2 = false;
-      int tempNow=get_temperature();
+      int tempNow = get_temperature();
       update_date(tempNow);
     }
   }
-  else{flag_tm_min2 = true;}
+  else
+  {
+    flag_tm_min2 = true;
+  }
 
   open_flag = true;
 }
-// 打开除湿模式
-void set_air_conditioner(/*bool man_open*/)
+// 设置空调状态
+void set_air_conditioner()
 {
   int TiGan = personalMode - 3; // 根据用户喜好进行修改温度用到的参数
-  // 根据外界温度高低分类给出不同设置
-  //   if (out_real_feel0 >= 35){
-  // 根据当前的时间不同给出不同的设置
-  //   if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
-  //   {
-  static int setTemp;
-  if (!open_flag) // 是循环的第一次时
+                                // 根据外界温度高低分类给出不同设置
+
+    if (0 <= out_real_feel0 && out_real_feel0 < 10)
   {
-    setTemp = 25;
-    SetWindSpeed = 2;
-    Setmode = 2;
+    if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 24;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(19 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    else if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 24;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(18 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    else
+    // if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 22;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(18 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
   }
-  else if (if_change)
-    keepInRealFeel(needTemperature, setTemp);
-  else
-    keepInRealFeel(27 + TiGan, setTemp);
-  hong_wai(setTemp, Setmode, SetWindSpeed);
-  //  }
-  //    if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
-  //    {
-  //      static int setTemp;
-  //      if (!open_flag)
-  //        setTemp = 26;
-  //      else if (if_change)
-  //        keepInRealFeel(needTemperature, setTemp);
-  //      else
-  //        keepInRealFeel(28 + TiGan, setTemp);
-  //      hong_wai(setTemp, 2);
-  //    }
-  //    if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
-  //    {
-  //      static int setTemp;
-  //      if (!open_flag)
-  //        setTemp = 24;
-  //      else if (if_change)
-  //        keepInRealFeel(needTemperature, setTemp);
-  //      else
-  //        keepInRealFeel(26 + TiGan, setTemp);
-  //      hong_wai(setTemp, 2);
-  //    }
-  //  }
 
-  // if (30 <= out_real_feel0 && out_real_feel0 < 35 && auto_open)
-  // {
-  //   if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 26;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(26 + TiGan, setTemp);
-  //     hong_wai(setTemp, 2);
-  //   }
-  //   if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 27;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(27 + TiGan, setTemp);
-  //     hong_wai(setTemp, 2);
-  //   }
-  //   if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 25;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(25 + TiGan, setTemp);
-  //     hong_wai(setTemp, 2);
-  //   }
-  // }
+  else if (out_real_feel0 < 0)
+  {
+    if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 24;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(18 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    else if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 25;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(18 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    else
+    // (time_info.tm_hour > 9 || time_info.tm_hour < 15)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 24;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(19 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+  }
+  if (out_real_feel0 >= 35)
+  {
+    // 根据当前的时间不同给出不同的设置
+    if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 25;
+        SetWindSpeed = 2;
+        Setmode = 2;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(27 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 26;
+        SetWindSpeed = 2;
+        Setmode = 2;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(28 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 24;
+        SetWindSpeed = 2;
+        Setmode = 2;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(26 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+  }
 
-  // // 空调自动模式（温度范围20~30）
-  // if (20 <= out_real_feel0 && out_real_feel0 < 30 && man_open)
-  // {
-  //   static int setTemp;
-  //   if (!open_flag)
-  //     setTemp = 25;
-  //   else if (if_change)
-  //     keepInRealFeel(needTemperature, setTemp);
-  //   else
-  //     keepInRealFeel(23 + TiGan, setTemp);
-  //   hong_wai(setTemp, 0);
-  // }
+  if (30 <= out_real_feel0 && out_real_feel0 < 35)
+  {
+    if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 26;
+        SetWindSpeed = 2;
+        Setmode = 2;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(26 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 27;
+        SetWindSpeed = 2;
+        Setmode = 2;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(27 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 25;
+        SetWindSpeed = 2;
+        Setmode = 2;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(25 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+  }
 
-  // // 空调制热模式
-  // if (15 <= out_real_feel0 && out_real_feel0 < 20 && auto_open)
-  // {
-  //   if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 20;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(19 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  //   if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 22;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(20 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  //   if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 19;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(18 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  // }
+  // 空调自动模式（温度范围20~30）
+  if (20 <= out_real_feel0 && out_real_feel0 < 30)
+  {
+    static int setTemp;
+    if (!open_flag) // 是循环的第一次时
+    {
+      setTemp = 25;
+      SetWindSpeed = 2;
+      Setmode = 0;
+    }
+    else if (if_change)
+      keepInRealFeel(needTemperature, setTemp);
+    else
+      keepInRealFeel(23 + TiGan, setTemp);
+    hong_wai(setTemp, Setmode, SetWindSpeed);
+  }
 
-  // if (10 <= out_real_feel0 && out_real_feel0 < 15 && auto_open)
-  // {
-  //   if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 20;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(18 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  //   if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 21;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(19 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  //   if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 19;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(17 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  // }
-  // if (0 <= out_real_feel0 && out_real_feel0 < 10 && auto_open)
-  // {
-  //   if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 24;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(17 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  //   if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 24;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(18 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  //   if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 20;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(16 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  // }
+  // 空调制热模式
+  if (15 <= out_real_feel0 && out_real_feel0 < 20)
+  {
+    if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 20;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(19 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 22;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(20 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 19;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(18 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+  }
 
-  // if (out_real_feel0 < 0 && auto_open)
-  // {
-  //   if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 24;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(17 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  //   if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 25;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(18 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  //   if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
-  //   {
-  //     static int setTemp;
-  //     if (!open_flag)
-  //       setTemp = 20;
-  //     else if (if_change)
-  //       keepInRealFeel(needTemperature, setTemp);
-  //     else
-  //       keepInRealFeel(16 + TiGan, setTemp);
-  //     hong_wai(setTemp, 4);
-  //   }
-  // }
+  if (10 <= out_real_feel0 && out_real_feel0 < 15)
+  {
+    if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 20;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(18 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 21;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(19 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+    if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
+    {
+      static int setTemp;
+      if (!open_flag) // 是循环的第一次时
+      {
+        setTemp = 19;
+        SetWindSpeed = 2;
+        Setmode = 4;
+      }
+      else if (if_change)
+        keepInRealFeel(needTemperature, setTemp);
+      else
+        keepInRealFeel(17 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+    }
+  }
 
-  // // 除湿模式
-  // if (get_humidity()> 75 && auto_open)
-  // {
-  //   humid_condition(1);
-  // }
 
-  // break;
-  // switch (mode)
-
-  // { // choose "mode:非常怕冷1 比较怕冷2 正常3 比较怕热4 非常怕热5";
-  //   // case(非常怕冷1)：{
-  //   // if (out_real_feel>35 && auto_open) 制冷模式from 7:00-10:00 & 14:30-21:00 setTemp=25;from 21:00-7:00 setTemp=26;from 10:00-14:30 setTemp=24;keepInRealFeel(28);
-  //   // if (30<out_real_feel<35 && auto_open) 制冷模式from 7:00-10:00 & 14:30-21:00 setTemp=26;from 21:00-7:00 setTemp=27;from 10:00-14:30 setTemp=25;keepInRealFeel(28);
-  //   // if（20<out_real_feel<30&& man_open) 自动模式 keepInRealFeel(27);
-  //   // if (15<out_real_feel<20 && auto_open) 制热模式from 7:00-10:00 & 14:30-21:00 setTemp=20;from 21:00-7:00 setTemp=22;from 10:00-14:30 setTemp=18;keepInRealFeel(24);
-  //   // if (10<out_real_feel<15 && auto_open) 制热模式from 7:00-10:00 & 14:30-21:00 setTemp=19;from 21:00-7:00 setTemp=21;from 10:00-14:30 setTemp=17;keepInRealFeel(22);
-  //   // if (0<out_real_feel<10 && auto_open) 制热模式from 7:00-10:00 & 14:30-21:00 setTemp=22;from 21:00-7:00 setTemp=24;from 10:00-14:30 setTemp=20;keepInRealFeel(21);
-  //   // if (out_real_feel<0 && auto_open) 制热模式from 7:00-10:00 & 14:30-21:00 setTemp=25;from 21:00-7:00 setTemp=26;from 10:00-14:30 setTemp=18;keepInRealFeel(21);
-  //   // if (inhumity >75 && auto_open)  更改为除湿模式 keep 40<inhumidity<60 in summer and 50<inhumidity<70 in winter ;
-  //   // if (realfeel0-realfeeli>10&&realfeel0<25)open air condition(强降温)}break;
-
-  //   // case(比较怕冷2)：{
-  //   // if (out_real_feel>35 && auto_open) 制冷模式from 6:30-9:00 & 15:00-21:00 setTemp=25;from 21:00-6:30 setTemp=26;from 9:00-15:00 setTemp=24;keepInRealFeel(27);
-  //   // if (30<out_real_feel<35 && auto_open) 制冷模式from 6:30-9:00 & 15:00-21:00 setTemp=26;from 21:00-6:30 setTemp=27;from 9:00-15:00 setTemp=25;keepInRealFeel(27);
-  //   // if（20<out_real_feel<30&& man_open) 自动模式 keepInRealFeel(26);
-  //   // if (15<out_real_feel<20 && auto_open) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=20;from 21:00-6:30 setTemp=22;from 9:00-15:00 setTemp=18;keepInRealFeel(23);
-  //   // if (10<out_real_feel<15 && auto_open) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=19;from 21:00-6:30 setTemp=21;from 9:00-15:00 setTemp=17;keepInRealFeel(21);
-  //   // if (0<out_real_feel<10 && auto_open) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=22;from 21:00-6:30 setTemp=24;from 9:00-15:00 setTemp=20;keepInRealFeel(20);
-  //   // if (out_real_feel<0 && auto_open) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=25;from 21:00-6:30 setTemp=26;from 9:00-15:00 setTemp=18;keepInRealFeel(20);
-  //   // if (inhumity >75 && auto_open)  更改为除湿模式 keep 40<inhumidity<60 in summer and 50<inhumidity<70 in winter ;
-  //   // if (realfeel0-realfeeli>10&&realfeel0<25)open air condition(强降温)}break;
-
-  //   // case 3: //正常模式
-  //   // 空调制冷模式
-  //   // case(比较怕热4)：{
-  //   // if (out_real_feel>35 && autoopen) 制冷模式from 6:30-9:00 & 15:00-21:00 setTemp=25;from 21:00-6:30 setTemp=26;from 9:00-15:00 setTemp=24;keepInRealFeel(25);
-  //   // if (30<out_real_feel<35 && autoopen) 制冷模式from 6:30-9:00 & 15:00-21:00 setTemp=26;from 21:00-6:30 setTemp=27;from 9:00-15:00 setTemp=25;keepInRealFeel(25);
-  //   // if(20<out_real_feel<30&& man_open) 自动模式 keepInRealFeel(23);
-  //   // if (15<out_real_feel<20 && autoopen) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=20;from 21:00-6:30 setTemp=22;from 9:00-15:00 setTemp=18;keepInRealFeel(20);
-  //   // if (10<out_real_feel<15 && autoopen) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=19;from 21:00-6:30 setTemp=21;from 9:00-15:00 setTemp=17;keepInRealFeel(19);
-  //   // if (0<out_real_feel<10 && autoopen) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=22;from 21:00-6:30 setTemp=24;from 9:00-15:00 setTemp=20;keepInRealFeel(19);
-  //   // if (out_real_feel<0 && autoopen) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=25;from 21:00-6:30 setTemp=26;from 9:00-15:00 setTemp=18;keepInRealFeel(19);
-  //   // if (inhumity >75 && autoopen)  更改为除湿模式 keep 40<inhumidity<60 in summer and 50<inhumidity<70 in winter ;
-  //   // if (realfeel0-realfeeli>10&&realfeel0<25)open air condition(强降温)}break;
-  //   // 7.if (temp>32||temp<10) open;
-
-  //   // case(非常怕热5)：{
-  //   // if (out_real_feel>35 && autoopen) 制冷模式from 6:30-9:00 & 15:00-21:00 setTemp=25;from 21:00-6:30 setTemp=26;from 9:00-15:00 setTemp=24;keepInRealFeel(24);
-  //   // if (30<out_real_feel<35 && autoopen) 制冷模式from 6:30-9:00 & 15:00-21:00 setTemp=26;from 21:00-6:30 setTemp=27;from 9:00-15:00 setTemp=25;keepInRealFeel(24);
-  //   // if（20<out_real_feel<30&& man_open) 自动模式 keepInRealFeel(22);
-  //   // if (15<out_real_feel<20 && autoopen) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=20;from 21:00-6:30 setTemp=22;from 9:00-15:00 setTemp=18;keepInRealFeel(19);
-  //   // if (10<out_real_feel<15 && autoopen) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=19;from 21:00-6:30 setTemp=21;from 9:00-15:00 setTemp=17;keepInRealFeel(18);
-  //   // if (0<out_real_feel<10 && autoopen) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=22;from 21:00-6:30 setTemp=24;from 9:00-15:00 setTemp=20;keepInRealFeel(18);
-  //   // if (out_real_feel<0 && autoopen) 制热模式from 6:30-9:00 & 15:00-21:00 setTemp=25;from 21:00-6:30 setTemp=26;from 9:00-15:00 setTemp=18;keepInRealFeel1(8);
-  //   // if (inhumity >75 && autoopen)  更改为除湿模式 keep 40<inhumidity<60 in summer and 50<inhumidity<70 in winter ;
-  //   // if (realfeel0-realfeeli>10&&realfeel0<25)open air condition(强降温)}break;
-  // }
-  // // Serial.print("condition: ");
-  // // Serial.println(condition0);
-  // // Serial.print("conditionId: ");Serial.println(conditionId0);
-  // // Serial.print("date: ");Serial.println(date0);
-  // // Serial.print("hour: ");Serial.println(hour0);
-  // // Serial.print("humidity: ");Serial.println(humidity0);
-  // // Serial.print("iconDay: ");Serial.println(iconDay0);
-  // // Serial.print("iconNight");Serial.println(iconNight0);
-  // // Serial.print("pop: ");Serial.println(pop0);
-  // // Serial.print("pressure: ");Serial.println(pressure0);
-  // // Serial.print("qpf: ");Serial.println(qpf0);
-  // // Serial.print("realFeel: ");Serial.println(realFeel0);
-  // // Serial.print("snow: ");Serial.println(snow0);
-  // // Serial.print("temp: ");Serial.println(temp0);
-  // // Serial.print("updatetime:");Serial.println(updatetime0)
+  // 除湿模式
+  if (get_humidity() > 75)
+  {
+    humid_condition(1);
+  }
 }
+// 打开除湿模式
 void humid_condition(uint8_t mode)
 {
   if (1)
@@ -631,16 +650,7 @@ void connect_WIFI()
     delay(300);
     Serial.print(".");
   }
-  // void WiFi_Connect(char *name, char *password)
-  // {
-  //     WiFi.begin(name, password);
-  //     Serial.print("connecting.");
-  //     while (WiFi.status() != WL_CONNECTED)
-  //     { //这里是阻塞程序，直到连接成功
-  //         delay(300);
-  //         Serial.print(".");
-  //     }
-  // }
+
 }
 // 校对当前时间
 void correct_time()
@@ -648,159 +658,181 @@ void correct_time()
   getLocalTime(&time_info);
   update_date(time_info.tm_mday);
   update_day(time_info.tm_wday);
-  update_time(time_info.tm_hour,time_info.tm_min);
+  update_time(time_info.tm_hour, time_info.tm_min);
 }
-// 设置空调状态
-void update_wind(int speedd)//显示风速
+// 显示风速
+void update_wind(int speedd) 
 {
-    int i = speedd;
-    drawSdJpeg(speed[i], 257, 24);
+  int i = speedd;
+  drawSdJpeg(speed[i], 257, 24);
 }
-void update_mode(int modee)//工作模式
+// 工作模式
+void update_mode(int modee) 
 {
-    int i = modee;
-    drawSdJpeg(mode[i], 257, 57);
+  int i = modee;
+  drawSdJpeg(mode[i], 257, 57);
 }
-void update_user(int userr)//用户偏好
+// 用户偏好
+void update_user(int userr) 
 {
-    int i = userr;
-    drawSdJpeg(user[i], 257, 90);
+  int i = userr;
+  drawSdJpeg(user[i], 257, 90);
+}
+// 显示设置温度
+void update_tempset(int set) 
+{
+  int i = set / 10;
+  int j = set % 10;
+  drawSdJpeg(BL_S[i], 218, 128);
+  drawSdJpeg(BL_S[j], 238, 128);
+}
+// 显示当前室内气温
+void update_tempnow(int tempnow) 
+{
+  int i = tempnow / 10;
+  int j = tempnow % 10;
+  drawSdJpeg(BL_L[i], 15, 50);
+  drawSdJpeg(BL_L[j], 80, 50);
+}
+// 显示日期
+void update_date(int date) 
+{
+  int i = date;
+  if (i < 10)
+    // showImage(152, 42, 6, 7, Image_WH_S[i]);
+    drawSdJpeg(WH_S[i], 162, 191);
+  else
+  {
+    drawSdJpeg(WH_S[i / 10], 162, 191);
+    drawSdJpeg(WH_S[i % 10], 169, 191);
+  }
+}
+// 显示星期几
+void update_day(int dayy) 
+{
+  int i = dayy;
+  drawSdJpeg(day[i], 180, 191);
+}
+// 显示天气
+void update_weather(int weatherr) 
+{
+  int i = weatherr;
+  drawSdJpeg(weather[i], 235, 177);
+}
+// 显示当日室外气温
+void update_today_temp(int tempmin, int tempmax) 
+{
+  if (tempmin >= 10)
+  {
+    drawSdJpeg(WH_S[tempmin / 10], 162, 207);
+    drawSdJpeg(WH_S[tempmin % 10], 169, 207);
+  }
+  else if (tempmin >= 0)
+  {
+    drawSdJpeg(WH_S[0], 162, 207);
+    drawSdJpeg(WH_S[tempmin % 10], 169, 207);
+  }
+  else if (tempmin > (-10))
+  {
+    drawSdJpeg(WH_S[10], 162, 207);
+    drawSdJpeg(WH_S[(-tempmin) % 10], 169, 207);
+  }
+  else
+    ;
+  if (tempmax >= 10)
+  {
+    drawSdJpeg(WH_S[tempmax / 10], 191, 207);
+    drawSdJpeg(WH_S[tempmax % 10], 199, 207);
+  }
+  else if (tempmax >= 0)
+  {
+    drawSdJpeg(WH_S[0], 191, 207);
+    drawSdJpeg(WH_S[tempmax % 10], 199, 207);
+  }
+  else if (tempmax > (-10))
+  {
+    drawSdJpeg(WH_S[10], 191, 207);
+    drawSdJpeg(WH_S[(-tempmax) % 10], 199, 207);
+  }
+  else
+    ;
+}
+// 显示时间
+void update_time(int hour, int min) 
+{
+  int i = hour / 10;
+  int j = hour % 10;
+  drawSdJpeg(WH_L[i], 30, 184);
+  drawSdJpeg(WH_L[j], 50, 184);
+  i = min / 10;
+  j = min % 10;
+  drawSdJpeg(WH_L[i], 93, 184);
+  drawSdJpeg(WH_L[j], 113, 184);
+}
 
-}
-void update_tempset(int set)//显示设置温度
+void drawSdJpeg(const char *filename, int xpos, int ypos)
 {
-    int i = set / 10;
-    int j = set % 10;
-    drawSdJpeg(BL_S[i], 218, 128);
-    drawSdJpeg(BL_S[j], 238, 128);
+  File jpegFile = SD.open(filename, FILE_READ);
+  if (!jpegFile)
+  {
+    return;
+  }
+  boolean decoded = JpegDec.decodeSdFile(jpegFile);
+  if (decoded)
+  {
+    jpegRender(xpos, ypos);
+  }
 }
-void update_tempnow(int tempnow)//当前温度
+
+void jpegRender(int xpos, int ypos)
 {
-    int i = tempnow / 10;
-    int j = tempnow % 10;
-    drawSdJpeg(BL_L[i], 15, 50);
-    drawSdJpeg(BL_L[j], 80, 50);
-}
-void update_date(int date)//显示日期
-{
-    int i = date;
-    if (i < 10)
-        // showImage(152, 42, 6, 7, Image_WH_S[i]);
-        drawSdJpeg(WH_S[i], 162, 191);
-    else {
-        drawSdJpeg(WH_S[i / 10], 162, 191);
-        drawSdJpeg(WH_S[i % 10], 169, 191);
-    }
-}
-void update_day(int dayy)//显示星期几
-{
-    int i = dayy;
-    drawSdJpeg(day[i], 180, 191);
-}
-void update_weather(int weatherr)//显示天气
-{
-    int i = weatherr;
-    drawSdJpeg(weather[i], 235, 177);
-}
-void update_today_temp(int tempmin, int tempmax)//显示当日气温
-{
-    if (tempmin >= 10)
+  uint32_t drawTime = millis();
+  uint16_t *pImg;
+  uint16_t mcu_w = JpegDec.MCUWidth;
+  uint16_t mcu_h = JpegDec.MCUHeight;
+  uint32_t max_x = JpegDec.width;
+  uint32_t max_y = JpegDec.height;
+  bool swapBytes = tft.getSwapBytes();
+  tft.setSwapBytes(true);
+  uint32_t min_w = (mcu_w < (max_x % mcu_w) ? mcu_w : (max_x % mcu_w));
+  uint32_t min_h = (mcu_h < (max_y % mcu_h) ? mcu_h : (max_y % mcu_h));
+  uint32_t win_w = mcu_w;
+  uint32_t win_h = mcu_h;
+  max_x += xpos;
+  max_y += ypos;
+  while (JpegDec.read())
+  {
+    pImg = JpegDec.pImage;
+    int mcu_x = JpegDec.MCUx * mcu_w + xpos;
+    int mcu_y = JpegDec.MCUy * mcu_h + ypos;
+    if (mcu_x + mcu_w <= max_x)
+      win_w = mcu_w;
+    else
+      win_w = min_w;
+    if (mcu_y + mcu_h <= max_y)
+      win_h = mcu_h;
+    else
+      win_h = min_h;
+    if (win_w != mcu_w)
     {
-        drawSdJpeg(WH_S[tempmin / 10], 162, 207);
-        drawSdJpeg(WH_S[tempmin % 10], 169, 207);
-    }
-    else if (tempmin >= 0)
-    {
-        drawSdJpeg(WH_S[0], 162, 207);
-        drawSdJpeg(WH_S[tempmin % 10], 169, 207);
-    }
-    else if (tempmin > (-10))
-    {
-        drawSdJpeg(WH_S[10], 162, 207);
-        drawSdJpeg(WH_S[(-tempmin) % 10], 169, 207);
-    }
-    else;
-    if (tempmax >= 10)
-    {
-        drawSdJpeg(WH_S[tempmax / 10], 191, 207);
-        drawSdJpeg(WH_S[tempmax % 10], 199, 207);
-    }
-    else if (tempmax >= 0)
-    {
-        drawSdJpeg(WH_S[0], 191, 207);
-        drawSdJpeg(WH_S[tempmax % 10], 199, 207);
-    }
-    else if (tempmax > (-10))
-    {
-        drawSdJpeg(WH_S[10], 191, 207);
-        drawSdJpeg(WH_S[(-tempmax) % 10], 199, 207);
-    }
-    else;
-}
-void update_time(int hour, int min)//显示时间
-{
-    int i = hour / 10;
-    int j = hour % 10;
-    drawSdJpeg(WH_L[i], 30, 184);
-    drawSdJpeg(WH_L[j], 50, 184);
-    i = min / 10;
-    j = min % 10;
-    drawSdJpeg(WH_L[i], 93, 184);
-    drawSdJpeg(WH_L[j], 113, 184);
-}
-void drawSdJpeg(const char* filename, int xpos, int ypos) {
-    File jpegFile = SD.open(filename, FILE_READ);
-    if (!jpegFile) {
-        return;
-    }
-    boolean decoded = JpegDec.decodeSdFile(jpegFile);
-    if (decoded) {
-        jpegRender(xpos, ypos);
-    }
-}
-void jpegRender(int xpos, int ypos) {
-    uint32_t drawTime = millis();
-    uint16_t* pImg;
-    uint16_t mcu_w = JpegDec.MCUWidth;
-    uint16_t mcu_h = JpegDec.MCUHeight;
-    uint32_t max_x = JpegDec.width;
-    uint32_t max_y = JpegDec.height;
-    bool swapBytes = tft.getSwapBytes();
-    tft.setSwapBytes(true);
-    uint32_t min_w = (mcu_w < (max_x% mcu_w) ? mcu_w : (max_x % mcu_w));
-    uint32_t min_h = (mcu_h < (max_y% mcu_h) ? mcu_h : (max_y % mcu_h));
-    uint32_t win_w = mcu_w;
-    uint32_t win_h = mcu_h;
-    max_x += xpos;
-    max_y += ypos;
-    while (JpegDec.read()) {
-        pImg = JpegDec.pImage;
-        int mcu_x = JpegDec.MCUx * mcu_w + xpos;
-        int mcu_y = JpegDec.MCUy * mcu_h + ypos;
-        if (mcu_x + mcu_w <= max_x) win_w = mcu_w;
-        else win_w = min_w;
-        if (mcu_y + mcu_h <= max_y) win_h = mcu_h;
-        else win_h = min_h;
-        if (win_w != mcu_w)
+      uint16_t *cImg;
+      int p = 0;
+      cImg = pImg + win_w;
+      for (int h = 1; h < win_h; h++)
+      {
+        p += mcu_w;
+        for (int w = 0; w < win_w; w++)
         {
-            uint16_t* cImg;
-            int p = 0;
-            cImg = pImg + win_w;
-            for (int h = 1; h < win_h; h++)
-            {
-                p += mcu_w;
-                for (int w = 0; w < win_w; w++)
-                {
-                    *cImg = *(pImg + w + p);
-                    cImg++;
-                }
-            }
+          *cImg = *(pImg + w + p);
+          cImg++;
         }
-        uint32_t mcu_pixels = win_w * win_h;
-        if ((mcu_x + win_w) <= tft.width() && (mcu_y + win_h) <= tft.height())
-            tft.pushImage(mcu_x, mcu_y, win_w, win_h, pImg);
-        else if ((mcu_y + win_h) >= tft.height())
-            JpegDec.abort();
+      }
     }
-    tft.setSwapBytes(swapBytes);
+    uint32_t mcu_pixels = win_w * win_h;
+    if ((mcu_x + win_w) <= tft.width() && (mcu_y + win_h) <= tft.height())
+      tft.pushImage(mcu_x, mcu_y, win_w, win_h, pImg);
+    else if ((mcu_y + win_h) >= tft.height())
+      JpegDec.abort();
+  }
+  tft.setSwapBytes(swapBytes);
 }
