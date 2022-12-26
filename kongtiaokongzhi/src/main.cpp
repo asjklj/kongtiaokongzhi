@@ -22,6 +22,7 @@
 #define SD_MOSI 19
 #define SD_SCLK 22
 #define SD_CS 18
+TFT_eSPI tft = TFT_eSPI(320, 240);
 void drawSdJpeg(const char *filename, int xpos, int ypos);
 void jpegRender(int xpos, int ypos);
 void update_wind(int speed);                      // 显示风速
@@ -83,7 +84,6 @@ char user[5][20] = {
     "/USER/user4.jpg",
 };
 char weather[20][30] = {"/WEATHER/sunny.jpg", "/WEATHER/duoyun.jpg", "/WEATHER/yin.jpg", "/WEATHER/xiaoyu.jpg", "/WEATHER/zhongyu.jpg", "/WEATHER/dayu.jpg", "/WEATHER/zhenyu.jpg", "/WEATHER/leizhenyu.jpg", "/WEATHER/yujiaxue.jpg", "/WEATHER/xiaoxue.jpg", "/WEATHER/zhongxue.jpg", "/WEATHER/daxue.jpg"};
-TFT_eSPI tft = TFT_eSPI(320, 240);
 SPIClass sdSPI(VSPI);
 using namespace std;
 void setup()
@@ -97,8 +97,8 @@ void setup()
   tft.init();
   tft.setRotation(2);
   tft.setSwapBytes(true);
-  tft.fillScreen(TFT_BLUE);
-  delay(10000);
+  // tft.fillScreen(TFT_BLUE);
+  // delay(10000);
   sdSPI.begin(SD_SCLK, SD_MISO, SD_MOSI, SD_CS);
   if (!SD.begin(SD_CS, sdSPI))
   {
