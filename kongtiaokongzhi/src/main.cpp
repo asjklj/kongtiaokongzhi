@@ -97,6 +97,8 @@ void setup()
   tft.init();
   tft.setRotation(2);
   tft.setSwapBytes(true);
+  tft.fillScreen(TFT_BLUE);
+  delay(10000);
   sdSPI.begin(SD_SCLK, SD_MISO, SD_MOSI, SD_CS);
   if (!SD.begin(SD_CS, sdSPI))
   {
