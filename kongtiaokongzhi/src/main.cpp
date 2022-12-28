@@ -724,7 +724,7 @@ void update_date(int date)
 // 显示星期几
 void update_day(int dayy)
 {
-  int i = dayy;
+  int i = (dayy+6)%7;
   drawSdJpeg(day[i], 180, 191);
 }
 // 显示天气
