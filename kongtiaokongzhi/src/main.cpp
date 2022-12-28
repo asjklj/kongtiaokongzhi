@@ -51,7 +51,7 @@ const int daylightOffset_sec = 0;       // 夏令时填写3600，否则填0
 bool open_flag = false;                 // 判断空调循环是否为第一次
 int SetWindSpeed;
 int Setmode;
-int switches = 0;
+bool switches = 0;
 int personal_mode = 3;
 int wind_speed;
 int conditionMode;
@@ -155,31 +155,35 @@ void loop()
   // 解析当前空调应该处于的状态（开或关）
   r = if_auto_open();
   switches = (r == "0") ? 0 : 1;
+  switches = on_off;
   // StaticJsonDocument<1024> doc3;
   // deserializeJson(doc3, r);
   // DeserializationError err3 = deserializeJson(doc3, r);
   // int switches = doc3["if_auto_open"];
   Serial.println(r);
+  update_tempset(needTemperature);
 
   if (if_change) // 如果用户通过网页进行输入且修改设置了
   {              // 更新空调状态
-    switches = on_off;
     personal_mode = personalMode;
     update_user(personal_mode);
     wind_speed = windSpeed;
     update_wind(wind_speed);
     conditionMode = modeChange;
     update_mode(conditionMode);
-    update_tempset(needTemperature);
+    if(on_off){
+      open_flag = false;
+      closeAirCondition();
+    }
   }
   if (!switches) // 判断当前空调是否应当开启
   {
     open_flag = false;
     closeAirCondition();
   }
-  int if_on = true;   // json
-  if (open_flag == 0) // 第一次
+  if (open_flag == false&&switches==1) // 第一次
   {
+    open_flag = true;
     s = getWeather(1);
     StaticJsonDocument<1024> doc1;
     deserializeJson(doc1, s);
@@ -248,7 +252,6 @@ void loop()
                                                                   // Serial.println(out_real_feel);
 
       Serial.println();
-      Serial.println("dhasjkdhajksdhajksdhkj");
       set_air_conditioner();
     }
   }
@@ -270,7 +273,7 @@ void loop()
     flag_tm_min2 = true;
   }
 
-  open_flag = true;
+
 }
 // 设置空调状态
 void set_air_conditioner()
@@ -637,11 +640,9 @@ void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t 
     ac.setXFan(false);
     ac.setLight(light);
     ac.setTurbo(false);
-    update_wind(speed);
-    update_mode(mode);
     update_tempset(temp);
-
-#if SEND_GREE
+    Serial.println("hello");
+#if SEND_KELVINATOR
     ac.send();
 #endif
     delay(1000);
