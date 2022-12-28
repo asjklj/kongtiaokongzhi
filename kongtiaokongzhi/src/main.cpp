@@ -18,6 +18,8 @@
 #include <TFT_eSPI.h>
 #include <JPEGDecoder.h>
 #include <climits>
+#include <iostream>
+#include <algorithm>
 #define SD_MISO 21
 #define SD_MOSI 19
 #define SD_SCLK 22
@@ -97,7 +99,7 @@ void setup()
   pinMode(12, OUTPUT);
   digitalWrite(12, HIGH);
   tft.init();
-  tft.setRotation(2);
+  tft.setRotation(1);
   tft.setSwapBytes(true);
   // tft.fillScreen(TFT_BLUE);
   // delay(10000);
@@ -112,6 +114,8 @@ void setup()
 
 void loop()
 {
+  Serial.println();
+  Serial.println("dhsajkda");
 
   delay(2000);
   update_today_temp(-2, 7);
@@ -123,6 +127,8 @@ void loop()
   Serial.println(time_info.tm_sec);
   // 解析用户输入修改
   t = getChange();
+  Serial.println();
+  Serial.println(t);
   StaticJsonDocument<1024> doc2;
   deserializeJson(doc2, t);
   DeserializationError err2 = deserializeJson(doc2, t);
@@ -132,8 +138,8 @@ void loop()
   windSpeed = doc2["set"]["windSpeed"];
   needTemperature = doc2["set"]["needTemperature"];
   modeChange = doc2["set"]["Mode"];
-  personalMode = doc2["set"]["personalMode"];
-  on_off = doc2["set"]["on_off"];
+  // personalMode = doc2["set"]["personalMode"];
+  // on_off = doc2["set"]["on_off"];
   // Serial.print("if_change:");
   // Serial.println(if_change);
   // Serial.print("windSpeed:");
@@ -182,7 +188,7 @@ void loop()
     delay(1000);
     // 读取室外气象数据
     strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
-    strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
+    // strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
     // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
     // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
     // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
@@ -240,6 +246,9 @@ void loop()
                                                                   // Serial.println(conditionId0);
                                                                   // Serial.print("out_real_feel:");
                                                                   // Serial.println(out_real_feel);
+
+      Serial.println();
+      Serial.println("dhasjkdhajksdhajksdhkj");
       set_air_conditioner();
     }
   }
