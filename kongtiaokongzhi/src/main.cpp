@@ -172,19 +172,16 @@ void loop()
     update_wind(wind_speed);
     conditionMode = modeChange;
     update_mode(conditionMode);
-    if(on_off){
-      open_flag = false;
-      closeAirCondition();
-    }
   }
   if (!switches) // 判断当前空调是否应当开启
   {
     open_flag = false;
     closeAirCondition();
   }
-  if (open_flag == false&&switches==1) // 第一次
+
+  if (open_flag == false && switches==1) // 第一次
   {
-    open_flag = true;
+    Serial.println("jjjj");
     s = getWeather(1);
     StaticJsonDocument<1024> doc1;
     deserializeJson(doc1, s);
@@ -215,6 +212,7 @@ void loop()
                                                                 // Serial.print("out_real_feel:");
                                                                 // Serial.println(out_real_feel);
     set_air_conditioner();
+    open_flag = true;
   }
   if (time_info.tm_min % 10 == 0) // per 10 mins
   {
