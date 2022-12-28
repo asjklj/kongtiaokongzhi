@@ -99,6 +99,7 @@ void setup()
   ac.begin();
   pinMode(12, OUTPUT);
   digitalWrite(12, HIGH);
+  dht_init();
   tft.init();
   tft.setRotation(1);
   tft.setSwapBytes(true);
@@ -285,6 +286,9 @@ void set_air_conditioner()
       else
         keepInRealFeel(19 + TiGan, setTemp);
       hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
     }
     else if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
     {
@@ -299,6 +303,9 @@ void set_air_conditioner()
         keepInRealFeel(needTemperature, setTemp);
       else
         keepInRealFeel(18 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
     }
     else
@@ -315,6 +322,9 @@ void set_air_conditioner()
         keepInRealFeel(needTemperature, setTemp);
       else
         keepInRealFeel(18 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
     }
   }
@@ -335,6 +345,9 @@ void set_air_conditioner()
       else
         keepInRealFeel(18 + TiGan, setTemp);
       hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
     }
     else if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
     {
@@ -349,6 +362,9 @@ void set_air_conditioner()
         keepInRealFeel(needTemperature, setTemp);
       else
         keepInRealFeel(18 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
     }
     else
@@ -365,6 +381,9 @@ void set_air_conditioner()
         keepInRealFeel(needTemperature, setTemp);
       else
         keepInRealFeel(19 + TiGan, setTemp);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
+      hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
     }
   }
