@@ -116,10 +116,11 @@ void loop()
 {
   Serial.println();
   Serial.println("dhsajkda");
-
   delay(2000);
   update_today_temp(-2, 7);
   update_weather(2);
+  int m=get_temperature()+0.5;
+  update_tempnow(m) ;
   correct_time();
   Serial.print("min:");
   Serial.println(time_info.tm_min);
@@ -132,14 +133,13 @@ void loop()
   StaticJsonDocument<1024> doc2;
   deserializeJson(doc2, t);
   DeserializationError err2 = deserializeJson(doc2, t);
-  Serial.println(t);
   // 读取用户输入修改的参数
   if_change = doc2["if_change"];
   windSpeed = doc2["set"]["windSpeed"];
   needTemperature = doc2["set"]["needTemperature"];
   modeChange = doc2["set"]["Mode"];
-  // personalMode = doc2["set"]["personalMode"];
-  // on_off = doc2["set"]["on_off"];
+  personalMode = doc2["set"]["personalMode"];
+  on_off = doc2["set"]["on_off"];
   // Serial.print("if_change:");
   // Serial.println(if_change);
   // Serial.print("windSpeed:");
@@ -160,7 +160,7 @@ void loop()
   // deserializeJson(doc3, r);
   // DeserializationError err3 = deserializeJson(doc3, r);
   // int switches = doc3["if_auto_open"];
-  Serial.println(r);
+  // Serial.println(r);
   update_tempset(needTemperature);
 
   if (if_change) // 如果用户通过网页进行输入且修改设置了
@@ -238,20 +238,6 @@ void loop()
       // const char* date0=doc["data"]["hourly"][0]["date"];//日期
       strcpy(iconDay0, doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
       strcpy(iconNight0, doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
-                                                                  // const char* qpf0=doc["data"]["hourly"][0]["qpf"];//定量降水预报
-                                                                  // Serial.println(if_change);
-                                                                  // Serial.println(windSpeed);
-                                                                  // Serial.println(needTemperature);
-                                                                  // Serial.println(mode_change);
-                                                                  // 室内传感器获取数据：1.体感温度inrealfeel 2.湿度inhumidity
-                                                                  // Serial.print("condition0:");
-                                                                  // Serial.println(condition0);
-                                                                  // Serial.print("conditionId0:");
-                                                                  // Serial.println(conditionId0);
-                                                                  // Serial.print("out_real_feel:");
-                                                                  // Serial.println(out_real_feel);
-
-      Serial.println();
       set_air_conditioner();
     }
   }
@@ -278,6 +264,7 @@ void loop()
 // 设置空调状态
 void set_air_conditioner()
 {
+  Serial.println("yes");
   int TiGan = personalMode - 3; // 根据用户喜好进行修改温度用到的参数
                                 // 根据外界温度高低分类给出不同设置
 
@@ -630,7 +617,7 @@ void closeAirCondition()
 // 红外模块
 void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t light, uint8_t sleep) // 请输入 是否打开(1打开0关闭) 温度 模式(0自动1除湿2制冷3通风4制热) 风速(123)  扫风 灯光 睡眠;
 {
-  if (begin_set)
+  if (1)
   {
     ac.on();
     ac.setFan(speed); //(123)
