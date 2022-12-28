@@ -90,6 +90,7 @@ SPIClass sdSPI(VSPI);
 using namespace std;
 void setup()
 {
+  dht_init();
   pinMode(27, OUTPUT);
   digitalWrite(27, HIGH);
   connect_WIFI();
