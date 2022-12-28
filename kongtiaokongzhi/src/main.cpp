@@ -22,7 +22,7 @@
 #define SD_MOSI 19
 #define SD_SCLK 22
 #define SD_CS 18
-TFT_eSPI tft = TFT_eSPI(320, 240);
+TFT_eSPI tft = TFT_eSPI(240, 320);
 void drawSdJpeg(const char *filename, int xpos, int ypos);
 void jpegRender(int xpos, int ypos);
 void update_wind(int speed);                      // 显示风速
@@ -41,7 +41,7 @@ void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set = 1, uint
 void correct_time();
 void closeAirCondition();
 void set_air_conditioner(/*bool man_open*/);
-const char *sid = "gongdao";            // wifi name
+const char *sid = "chiyizi";            // wifi name
 const char *password = "12345678";      // wifi password
 const char *ntpServer = "pool.ntp.org"; // 网络时间服务器
 const long gmtOffset_sec = 8 * 3600;    // 时区设置函数，东八区（UTC/GMT+8:00）写成8*3600
@@ -54,8 +54,8 @@ int personal_mode = 3;
 int wind_speed;
 int conditionMode;
 struct tm time_info;
-const uint16_t kIrLed = 15; // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRKelvinatorAC ac(kIrLed);  // Set the GPIO to be used for sending messages.
+const uint16_t kIrLed = 5; // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+IRKelvinatorAC ac(kIrLed); // Set the GPIO to be used for sending messages.
 uint8_t temp, begin;
 bool flag_tm_min10 = true;
 bool flag_tm_min2 = true;
@@ -88,6 +88,8 @@ SPIClass sdSPI(VSPI);
 using namespace std;
 void setup()
 {
+  pinMode(27, OUTPUT);
+  digitalWrite(27, HIGH);
   connect_WIFI();
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   correct_time();
@@ -110,6 +112,7 @@ void setup()
 
 void loop()
 {
+
   delay(2000);
   update_today_temp(-2, 7);
   update_weather(2);
@@ -161,6 +164,7 @@ void loop()
     update_wind(wind_speed);
     conditionMode = modeChange;
     update_mode(conditionMode);
+    update_tempset(needTemperature);
   }
   if (!switches) // 判断当前空调是否应当开启
   {
@@ -265,7 +269,7 @@ void set_air_conditioner()
   int TiGan = personalMode - 3; // 根据用户喜好进行修改温度用到的参数
                                 // 根据外界温度高低分类给出不同设置
 
-    if (0 <= out_real_feel0 && out_real_feel0 < 10)
+  if (0 <= out_real_feel0 && out_real_feel0 < 10)
   {
     if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
     {
@@ -579,7 +583,6 @@ void set_air_conditioner()
     }
   }
 
-
   // 除湿模式
   if (get_humidity() > 75)
   {
@@ -652,7 +655,6 @@ void connect_WIFI()
     delay(300);
     Serial.print(".");
   }
-
 }
 // 校对当前时间
 void correct_time()
@@ -663,25 +665,25 @@ void correct_time()
   update_time(time_info.tm_hour, time_info.tm_min);
 }
 // 显示风速
-void update_wind(int speedd) 
+void update_wind(int speedd)
 {
   int i = speedd;
   drawSdJpeg(speed[i], 257, 24);
 }
 // 工作模式
-void update_mode(int modee) 
+void update_mode(int modee)
 {
   int i = modee;
   drawSdJpeg(mode[i], 257, 57);
 }
 // 用户偏好
-void update_user(int userr) 
+void update_user(int userr)
 {
   int i = userr;
   drawSdJpeg(user[i], 257, 90);
 }
 // 显示设置温度
-void update_tempset(int set) 
+void update_tempset(int set)
 {
   int i = set / 10;
   int j = set % 10;
@@ -689,7 +691,7 @@ void update_tempset(int set)
   drawSdJpeg(BL_S[j], 238, 128);
 }
 // 显示当前室内气温
-void update_tempnow(int tempnow) 
+void update_tempnow(int tempnow)
 {
   int i = tempnow / 10;
   int j = tempnow % 10;
@@ -697,7 +699,7 @@ void update_tempnow(int tempnow)
   drawSdJpeg(BL_L[j], 80, 50);
 }
 // 显示日期
-void update_date(int date) 
+void update_date(int date)
 {
   int i = date;
   if (i < 10)
@@ -710,19 +712,19 @@ void update_date(int date)
   }
 }
 // 显示星期几
-void update_day(int dayy) 
+void update_day(int dayy)
 {
   int i = dayy;
   drawSdJpeg(day[i], 180, 191);
 }
 // 显示天气
-void update_weather(int weatherr) 
+void update_weather(int weatherr)
 {
   int i = weatherr;
   drawSdJpeg(weather[i], 235, 177);
 }
 // 显示当日室外气温
-void update_today_temp(int tempmin, int tempmax) 
+void update_today_temp(int tempmin, int tempmax)
 {
   if (tempmin >= 10)
   {
@@ -760,7 +762,7 @@ void update_today_temp(int tempmin, int tempmax)
     ;
 }
 // 显示时间
-void update_time(int hour, int min) 
+void update_time(int hour, int min)
 {
   int i = hour / 10;
   int j = hour % 10;

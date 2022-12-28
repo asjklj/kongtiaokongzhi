@@ -3,7 +3,7 @@
 
 #include "DHTesp.h"
 
-#define DHTPIN 18
+#define DHTPIN 26
 
 DHTesp dht;
 //传感器初始化
