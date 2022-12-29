@@ -103,8 +103,6 @@ void setup()
   tft.init();
   tft.setRotation(1);
   tft.setSwapBytes(true);
-  // tft.fillScreen(TFT_BLUE);
-  // delay(10000);
   sdSPI.begin(SD_SCLK, SD_MISO, SD_MOSI, SD_CS);
   if (!SD.begin(SD_CS, sdSPI))
   {
@@ -121,8 +119,8 @@ void loop()
   delay(2000);
   update_today_temp(-2, 7);
   update_weather(2);
-  int m=get_temperature()+0.5;
-  update_tempnow(m) ;
+  int m = get_temperature() + 0.5;
+  update_tempnow(m);
   correct_time();
   Serial.print("min:");
   Serial.println(time_info.tm_min);
@@ -142,46 +140,14 @@ void loop()
   modeChange = doc2["set"]["Mode"];
   personalMode = doc2["set"]["personalMode"];
   on_off = doc2["set"]["on_off"];
-  // Serial.print("if_change:");
-  // Serial.println(if_change);
-  // Serial.print("windSpeed:");
-  // Serial.println(windSpeed);
-  // Serial.print("needTemperature:");
-  // Serial.println(needTemperature);
-  // Serial.print("modeChange:");
-  // Serial.println(modeChange);
-  // Serial.print("personalMode:");
-  // Serial.println(personalMode);
-  // Serial.print("on_off:");
-  // Serial.println(on_off);
   // 解析当前空调应该处于的状态（开或关）
   r = if_auto_open();
   switches = (r == "0") ? 0 : 1;
   switches = on_off;
-  // StaticJsonDocument<1024> doc3;
-  // deserializeJson(doc3, r);
-  // DeserializationError err3 = deserializeJson(doc3, r);
-  // int switches = doc3["if_auto_open"];
-  // Serial.println(r);
   update_tempset(needTemperature);
- update_wind(windSpeed);
- update_user(personalMode);
-  if (if_change) // 如果用户通过网页进行输入且修改设置了
-  {              // 更新空调状态
-    personal_mode = personalMode;
-    update_user(personal_mode);
-    wind_speed = windSpeed;
-    update_wind(wind_speed);
-    conditionMode = modeChange;
-    update_mode(conditionMode);
-  }
-  if (!switches) // 判断当前空调是否应当开启
-  {
-    open_flag = false;
-    closeAirCondition();
-  }
-
-  if (open_flag == false && switches==1) // 第一次
+  update_wind(windSpeed);
+  update_user(personalMode);
+  if (open_flag == false && switches == 1) // 第一次
   {
     Serial.println("jjjj");
     s = getWeather(1);
@@ -191,30 +157,30 @@ void loop()
     Serial.println(s);
     delay(1000);
     // 读取室外气象数据
-    strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
-    // strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
-    // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
-    // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
-    // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
+    strcpy(condition0, doc1["data"]["hourly"][0]["condition"]); // 天气
     strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
     out_real_feel0 = std::stoi(out_real_feel);
     // const char* date0=doc["data"]["hourly"][0]["date"];//日期
     strcpy(iconDay0, doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
     strcpy(iconNight0, doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
-                                                                // const char* qpf0=doc["data"]["hourly"][0]["qpf"];//定量降水预报
-                                                                // Serial.println(if_change);
-                                                                // Serial.println(windSpeed);
-                                                                // Serial.println(needTemperature);
-                                                                // Serial.println(mode_change);
-                                                                // 室内传感器获取数据：1.体感温度inrealfeel 2.湿度inhumidity
-                                                                // Serial.print("condition0:");
-                                                                // Serial.println(condition0);
-                                                                // Serial.print("conditionId0:");
-                                                                // Serial.println(conditionId0);
-                                                                // Serial.print("out_real_feel:");
-                                                                // Serial.println(out_real_feel);
     set_air_conditioner();
     open_flag = true;
+  }
+  else if (!switches) // 判断当前空调是否应当开启
+  {
+    open_flag = false;
+    closeAirCondition();
+  }
+  if (if_change) // 如果用户通过网页进行输入且修改设置了
+  {              // 更新空调状态
+    Serial.println("change");
+    personal_mode = personalMode;
+    update_user(personal_mode);
+    wind_speed = windSpeed;
+    update_wind(wind_speed);
+    conditionMode = modeChange;
+    update_mode(conditionMode);
+    set_air_conditioner();
   }
   if (time_info.tm_min % 10 == 0) // per 10 mins
   {
@@ -231,12 +197,8 @@ void loop()
       // 读取室外气象数据
       strcpy(condition0, doc1["data"]["hourly"][0]["condition"]);     // 天气
       strcpy(conditionId0, doc1["data"]["hourly"][0]["conditionId"]); // 天气编码
-      // const char* humidity0=doc["data"]["hourly"][0]["humidity"];//室外湿度
-      // const char* temp0=doc["data"]["hourly"][0]["temp"];//室外气温
-      // const char* snow0=doc["data"]["hourly"][0]["snow"];//降雪
-      strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
+      strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]);   // 室外体感温度
       out_real_feel0 = std::stoi(out_real_feel);
-      // const char* date0=doc["data"]["hourly"][0]["date"];//日期
       strcpy(iconDay0, doc1["data"]["hourly"][0]["iconDay"]);     // 白天天气图标
       strcpy(iconNight0, doc1["data"]["hourly"][0]["iconNight"]); // 夜晚天气图标
       set_air_conditioner();
@@ -259,8 +221,6 @@ void loop()
   {
     flag_tm_min2 = true;
   }
-
-
 }
 // 设置空调状态
 void set_air_conditioner()
@@ -282,12 +242,16 @@ void set_air_conditioner()
         Setmode = 4;
       }
       else if (if_change)
-      {Serial.println("2");
-        keepInRealFeel(needTemperature, setTemp);}
+      {
+        Serial.println("2");
+        // keepInRealFeel(needTemperature, setTemp);
+        setTemp=needTemperature;
+      }
       else
-        {
-          Serial.println("3");
-          keepInRealFeel(19 + TiGan, setTemp);}
+      {
+        Serial.println("3");
+        keepInRealFeel(19 + TiGan, setTemp);
+      }
       Serial.println("4");
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -735,7 +699,7 @@ void update_date(int date)
 // 显示星期几
 void update_day(int dayy)
 {
-  int i = (dayy+6)%7;
+  int i = (dayy + 6) % 7;
   drawSdJpeg(day[i], 180, 191);
 }
 // 显示天气
