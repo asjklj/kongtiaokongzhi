@@ -90,7 +90,6 @@ SPIClass sdSPI(VSPI);
 using namespace std;
 void setup()
 {
-  dht_init();
   pinMode(27, OUTPUT);
   digitalWrite(27, HIGH);
   connect_WIFI();
@@ -145,7 +144,7 @@ void loop()
   switches = (r == "0") ? 0 : 1;
   switches = on_off;
   update_tempset(needTemperature);
-  update_wind(windSpeed);
+  update_wind(windSpeed-1);
   update_user(personalMode);
   if (open_flag == false && switches == 1) // 第一次
   {
@@ -246,6 +245,8 @@ void set_air_conditioner()
         Serial.println("2");
         // keepInRealFeel(needTemperature, setTemp);
         setTemp=needTemperature;
+        Setmode=conditionMode;
+        SetWindSpeed=windSpeed;
       }
       else
       {
