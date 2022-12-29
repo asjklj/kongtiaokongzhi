@@ -155,7 +155,6 @@ void loop()
     deserializeJson(doc1, s);
     DeserializationError err1 = deserializeJson(doc1, s);
     Serial.println(s);
-    delay(1000);
     // 读取室外气象数据
     strcpy(condition0, doc1["data"]["hourly"][0]["condition"]); // 天气
     strcpy(out_real_feel, doc1["data"]["hourly"][0]["realFeel"]); // 室外体感温度
