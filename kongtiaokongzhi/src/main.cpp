@@ -255,7 +255,7 @@ void set_air_conditioner()
       else
       {
         Serial.println("3");
-        keepInRealFeel(19 + TiGan, setTemp);
+        // keepInRealFeel(19 + TiGan, setTemp);
       }
       Serial.println("4");
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -265,17 +265,28 @@ void set_air_conditioner()
     }
     else if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
     {
-      static int setTemp;
+            static int setTemp;
       if (!open_flag) // 是循环的第一次时
       {
+        Serial.println("1");
         setTemp = 24;
         SetWindSpeed = 2;
         Setmode = 4;
       }
       else if (if_change)
-        keepInRealFeel(needTemperature, setTemp);
+      {
+        Serial.println("2");
+        // keepInRealFeel(needTemperature, setTemp);
+        setTemp=needTemperature;
+        Setmode=conditionMode;
+        SetWindSpeed=windSpeed;
+      }
       else
-        keepInRealFeel(18 + TiGan, setTemp);
+      {
+        Serial.println("3");
+        // keepInRealFeel(18 + TiGan, setTemp);
+      }
+      Serial.println("4");
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -284,17 +295,28 @@ void set_air_conditioner()
     else
     // if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
     {
-      static int setTemp;
+            static int setTemp;
       if (!open_flag) // 是循环的第一次时
       {
+        Serial.println("1");
         setTemp = 22;
         SetWindSpeed = 2;
         Setmode = 4;
       }
       else if (if_change)
-        keepInRealFeel(needTemperature, setTemp);
+      {
+        Serial.println("2");
+        // keepInRealFeel(needTemperature, setTemp);
+        setTemp=needTemperature;
+        Setmode=conditionMode;
+        SetWindSpeed=windSpeed;
+      }
       else
-        keepInRealFeel(18 + TiGan, setTemp);
+      {
+        Serial.println("3");
+        // keepInRealFeel(18 + TiGan, setTemp);
+      }
+      Serial.println("4");
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -302,21 +324,32 @@ void set_air_conditioner()
     }
   }
 
-  else if (out_real_feel0 < 0)
+  else if (switches==1&&out_real_feel0 < 0)
   {
     if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
     {
       static int setTemp;
       if (!open_flag) // 是循环的第一次时
       {
+        Serial.println("1");
         setTemp = 24;
         SetWindSpeed = 2;
         Setmode = 4;
       }
       else if (if_change)
-        keepInRealFeel(needTemperature, setTemp);
+      {
+        Serial.println("2");
+        // keepInRealFeel(needTemperature, setTemp);
+        setTemp=needTemperature;
+        Setmode=conditionMode;
+        SetWindSpeed=windSpeed;
+      }
       else
-        keepInRealFeel(18 + TiGan, setTemp);
+      {
+        Serial.println("3");
+        // keepInRealFeel(19 + TiGan, setTemp);
+      }
+      Serial.println("4");
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -324,36 +357,58 @@ void set_air_conditioner()
     }
     else if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
     {
-      static int setTemp;
+            static int setTemp;
       if (!open_flag) // 是循环的第一次时
       {
-        setTemp = 25;
+        Serial.println("1");
+        setTemp = 24;
         SetWindSpeed = 2;
         Setmode = 4;
       }
       else if (if_change)
-        keepInRealFeel(needTemperature, setTemp);
+      {
+        Serial.println("2");
+        // keepInRealFeel(needTemperature, setTemp);
+        setTemp=needTemperature;
+        Setmode=conditionMode;
+        SetWindSpeed=windSpeed;
+      }
       else
-        keepInRealFeel(18 + TiGan, setTemp);
+      {
+        Serial.println("3");
+        // keepInRealFeel(18 + TiGan, setTemp);
+      }
+      Serial.println("4");
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
     }
     else
-    // (time_info.tm_hour > 9 || time_info.tm_hour < 15)
+    // if (time_info.tm_hour > 9 || time_info.tm_hour < 15)
     {
-      static int setTemp;
+            static int setTemp;
       if (!open_flag) // 是循环的第一次时
       {
-        setTemp = 24;
+        Serial.println("1");
+        setTemp = 22;
         SetWindSpeed = 2;
         Setmode = 4;
       }
       else if (if_change)
-        keepInRealFeel(needTemperature, setTemp);
+      {
+        Serial.println("2");
+        // keepInRealFeel(needTemperature, setTemp);
+        setTemp=needTemperature;
+        Setmode=conditionMode;
+        SetWindSpeed=windSpeed;
+      }
       else
-        keepInRealFeel(19 + TiGan, setTemp);
+      {
+        Serial.println("3");
+        // keepInRealFeel(18 + TiGan, setTemp);
+      }
+      Serial.println("4");
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -620,8 +675,7 @@ void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t 
   {
     ac.on();
     ac.setFan(speed); //(123)
-                      // kGreeAuto 0, kGreeDry 1, kGreeCool 2, kGreeFan 3, kGreeHeat 4
-    ac.setMode(mode);
+    ac.setMode(mode);// kGreeAuto 0, kGreeDry 1, kGreeCool 2, kGreeFan 3, kGreeHeat 4
     ac.setTemp(temp); // 16
     ac.setXFan(false);
     ac.setLight(light);
