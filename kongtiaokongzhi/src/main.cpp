@@ -164,7 +164,8 @@ void loop()
   // int switches = doc3["if_auto_open"];
   // Serial.println(r);
   update_tempset(needTemperature);
-
+ update_wind(windSpeed);
+ update_user(personalMode);
   if (if_change) // 如果用户通过网页进行输入且修改设置了
   {              // 更新空调状态
     personal_mode = personalMode;
@@ -275,14 +276,19 @@ void set_air_conditioner()
       static int setTemp;
       if (!open_flag) // 是循环的第一次时
       {
+        Serial.println("1");
         setTemp = 24;
         SetWindSpeed = 2;
         Setmode = 4;
       }
       else if (if_change)
-        keepInRealFeel(needTemperature, setTemp);
+      {Serial.println("2");
+        keepInRealFeel(needTemperature, setTemp);}
       else
-        keepInRealFeel(19 + TiGan, setTemp);
+        {
+          Serial.println("3");
+          keepInRealFeel(19 + TiGan, setTemp);}
+      Serial.println("4");
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
