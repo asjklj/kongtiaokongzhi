@@ -231,7 +231,7 @@ void set_air_conditioner()
   int TiGan = personalMode - 3; // 根据用户喜好进行修改温度用到的参数
                                 // 根据外界温度高低分类给出不同设置
 
-  if (0 <= out_real_feel0 && out_real_feel0 < 10)
+  if (switches==1&&0 <= out_real_feel0 && out_real_feel0 < 10)
   {
     if ((time_info.tm_hour >= 6 && time_info.tm_hour < 9) || (time_info.tm_hour > 15 && time_info.tm_hour <= 21))
     {
