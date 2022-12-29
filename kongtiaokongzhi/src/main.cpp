@@ -602,7 +602,7 @@ void humid_condition(uint8_t mode)
 }
 // 关机
 void closeAirCondition()
-{
+{Serial.println("5");
   ac.off();
   // Serial.println("not running");
 }
