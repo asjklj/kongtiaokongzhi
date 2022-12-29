@@ -605,6 +605,8 @@ void humid_condition(uint8_t mode)
 void closeAirCondition()
 {Serial.println("5");
   ac.off();
+  ac.send();
+  delay(1000);
   // Serial.println("not running");
 }
 // 红外模块
