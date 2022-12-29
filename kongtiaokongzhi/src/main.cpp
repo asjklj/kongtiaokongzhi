@@ -669,8 +669,8 @@ void closeAirCondition()
 // 红外模块
 void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t light, uint8_t sleep) // 请输入 是否打开(1打开0关闭) 温度 模式(0自动1除湿2制冷3通风4制热) 风速(123)  扫风 灯光 睡眠;
 {
-  if(begin_set==1)begin_set=2;
-  else if(begin_set==2) begin_set=1;
+  // if(begin_set==1)begin_set=2;
+  // else if(begin_set==2) begin_set=1;
   if (1)
   {
     ac.on();
