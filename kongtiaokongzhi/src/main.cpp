@@ -146,6 +146,7 @@ void loop()
   update_tempset(needTemperature);
   update_wind(windSpeed-1);
   update_user(personalMode);
+  update_mode(modeChange);
   if (open_flag == false && switches == 1) // 第一次
   {
     Serial.println("jjjj");
