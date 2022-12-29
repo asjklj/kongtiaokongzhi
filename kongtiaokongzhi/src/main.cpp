@@ -166,7 +166,7 @@ void loop()
     set_air_conditioner();
     open_flag = true;
   }
-  else if (!switches) // 判断当前空调是否应当开启
+  else if (!switches&&if_change==1) // 判断当前空调是否应当开启
   {
     open_flag = false;
     closeAirCondition();
