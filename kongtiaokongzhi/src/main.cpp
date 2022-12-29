@@ -169,6 +169,9 @@ void loop()
   {
     open_flag = false;
     closeAirCondition();
+    closeAirCondition();
+    closeAirCondition();
+    closeAirCondition();
   }
   if (if_change) // 如果用户通过网页进行输入且修改设置了
   {              // 更新空调状态
