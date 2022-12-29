@@ -603,7 +603,7 @@ void humid_condition(uint8_t mode)
 }
 // 关机
 void closeAirCondition()
-{Serial.println("5");
+{Serial.println("close");
   ac.off();
 #if SEND_KELVINATOR
     ac.send();
@@ -627,7 +627,7 @@ void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t 
     ac.setLight(light);
     ac.setTurbo(false);
     update_tempset(temp);
-    Serial.println("hello");
+    Serial.println("hongwai ok");
 #if SEND_KELVINATOR
     ac.send();
 #endif
