@@ -37,28 +37,29 @@ String getChange()
 //获取当前是否为用户设置的空调开启时间（1 开启；0 关闭）
 //返回一个json类型的字符串
 String if_auto_open(){
-    HTTPClient http;
-    http.begin("http://81.68.216.118:8021/zlh2/"); // HTTP begin
+    // HTTPClient http;
+    // http.begin("http://81.68.216.118:8021/zlh2/"); // HTTP begin
    
-    int httpCode = http.GET();
+    // int httpCode = http.GET();
 
-    if (httpCode > 0)
-    {
-        // httpCode will be negative on error
-        // Serial.printf("HTTP Get Code: %d\r\n", httpCode);
+    // if (httpCode > 0)
+    // {
+    //     // httpCode will be negative on error
+    //     // Serial.printf("HTTP Get Code: %d\r\n", httpCode);
 
-        if (httpCode == HTTP_CODE_OK) // 收到正确的内容
-        {
-            String if_auto_open = http.getString();
-            http.end();
-            // return if_auto_open;
-            return "1";
+    //     if (httpCode == HTTP_CODE_OK) // 收到正确的内容
+    //     {
+    //         String if_auto_open = http.getString();
+    //         http.end();
+    //         // return if_auto_open;
+    //         return "1";
 
-        }
-    }
-    else
-    {
-        http.end();
-        return "0";
-    }
+    //     }
+    // }
+    // else
+    // {
+    //     http.end();
+    //     return "0";
+    // }
+    return "0";
 }
