@@ -10,7 +10,7 @@
 String getChange()
 {
     HTTPClient http;
-    http.begin("http://81.68.216.118:8021/zlh/"); // HTTP begin
+    http.begin("http://81.68.216.118:9094/api/get/foresp32/airset/"); // HTTP begin
     int httpCode = http.GET();
 
     if (httpCode > 0)
@@ -51,7 +51,9 @@ String if_auto_open(){
         {
             String if_auto_open = http.getString();
             http.end();
-            return if_auto_open;
+            // return if_auto_open;
+            return "1";
+
         }
     }
     else
