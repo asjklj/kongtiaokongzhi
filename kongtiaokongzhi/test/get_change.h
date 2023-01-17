@@ -10,7 +10,7 @@
 String getChange()
 {
     HTTPClient http;
-    http.begin("http://81.68.216.118:9094/api/get/foresp32/airset/"); // HTTP begin
+    http.begin("http://81.68.216.118:9094/api/get/foresp32/airset"); // HTTP begin
     int httpCode = http.GET();
 
     if (httpCode > 0)

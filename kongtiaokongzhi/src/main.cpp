@@ -113,9 +113,7 @@ void setup()
 
 void loop()
 {
-  Serial.println();
-  Serial.println("dhsajkda");
-  delay(2000);
+  delay(1000);
   update_today_temp(-2, 7);
   update_weather(2);
   int m = get_temperature() + 0.5;
@@ -149,7 +147,6 @@ void loop()
   update_mode(modeChange);
   if (open_flag == false && switches == 1) // 第一次
   {
-    Serial.println("jjjj");
     s = getWeather(1);
     StaticJsonDocument<1024> doc1;
     deserializeJson(doc1, s);
@@ -175,7 +172,6 @@ void loop()
   }
   if (if_change) // 如果用户通过网页进行输入且修改设置了
   {              // 更新空调状态
-    Serial.println("change");
     personal_mode = personalMode;
     update_user(personal_mode);
     wind_speed = windSpeed;
@@ -227,7 +223,6 @@ void loop()
 // 设置空调状态
 void set_air_conditioner()
 {
-  Serial.println("yes");
   int TiGan = personalMode - 3; // 根据用户喜好进行修改温度用到的参数
                                 // 根据外界温度高低分类给出不同设置
 
@@ -260,7 +255,6 @@ void set_air_conditioner()
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
-      hong_wai(setTemp, Setmode, SetWindSpeed);
     }
     else if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
     {
@@ -286,7 +280,6 @@ void set_air_conditioner()
         // keepInRealFeel(18 + TiGan, setTemp);
       }
       Serial.println("4");
-      hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -316,7 +309,6 @@ void set_air_conditioner()
         // keepInRealFeel(18 + TiGan, setTemp);
       }
       Serial.println("4");
-      hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -352,7 +344,6 @@ void set_air_conditioner()
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
-      hong_wai(setTemp, Setmode, SetWindSpeed);
     }
     else if (time_info.tm_hour > 21 || time_info.tm_hour < 6)
     {
@@ -378,7 +369,6 @@ void set_air_conditioner()
         // keepInRealFeel(18 + TiGan, setTemp);
       }
       Serial.println("4");
-      hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -408,7 +398,6 @@ void set_air_conditioner()
         // keepInRealFeel(18 + TiGan, setTemp);
       }
       Serial.println("4");
-      hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
       hong_wai(setTemp, Setmode, SetWindSpeed);
@@ -652,7 +641,6 @@ void humid_condition(uint8_t mode)
   else
   {
     ac.off();
-    Serial.println("not running");
   }
 }
 // 关机
@@ -662,7 +650,7 @@ void closeAirCondition()
 #if SEND_KELVINATOR
     ac.send();
 #endif
-    delay(1000);
+    delay(500);
   // Serial.println("not running");
 }
 // 红外模块
@@ -680,11 +668,10 @@ void hong_wai(uint8_t temp, uint8_t mode, uint8_t speed, int begin_set, uint8_t 
     ac.setLight(light);
     ac.setTurbo(false);
     update_tempset(temp);
-    Serial.println("hongwai ok");
 #if SEND_KELVINATOR
     ac.send();
 #endif
-    delay(1000);
+    delay(5000);
   }
   else
   {
